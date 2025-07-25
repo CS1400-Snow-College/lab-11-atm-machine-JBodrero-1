@@ -3,13 +3,10 @@
 //  Lab 10  ATM
 
 
-using System.Net.Sockets;
-
 string[] readBankFile = File.ReadAllLines("bank.txt");  // Read in bank database
 List<(string userName, int PIN, double balance)> customerData = new List<(string userName, int PIN, double balance)>();
 
 string[] customerTemp;
-//(string)
 
 Stack<double> transStack = new Stack<double>();
 
@@ -19,20 +16,15 @@ double balanceTemp = 0;
 int location; 
 int option = -1;
 
-foreach (string customer in readBankFile)
+foreach (string customer in readBankFile)       //
 {
     customerTemp = customer.Split(',');
     nameTemp = customerTemp[0];
     PINTemp = Convert.ToInt32(customerTemp[1]);
     balanceTemp = Convert.ToDouble(customerTemp[2]);
-
     customerData.Add((nameTemp, PINTemp, balanceTemp));
 
 }
-// customerData.ForEach(thing => Console.Write($"{thing}, ")); // Cycles through list, printing each item.
-// foreach (string customer in readBankFile)
-
-
 
 /*foreach (var customer in customerData)
 {
@@ -43,58 +35,75 @@ foreach (string customer in readBankFile)
 Console.Clear();
 Console.WriteLine("Welcome to BadgerBank.");
 currentCustomer = ValidLogin(customerData);
-if (currentCustomer.PIN != -1)
+
+/*if (currentCustomer.PIN != -1)
 {
     Console.Clear();
     Console.WriteLine("Thank you for logging in. ");
-    
-}
-Console.WriteLine(@"Please pick an option from the list below.
-1.  Check Balance
-2.  Withdraw
-3.  Deposit
-4.  Display last 5 transactions
-5.  Quick Withdraw $40
-6.  Quick Withdraw $100
-7.  End current session");
-Console.Write("Selection: ");
+}*/
 
-while (!Int32.TryParse(Console.ReadLine(), out option)) ;  //  Check if input is an integer
-if (option < 1 || option > 7)
+do
 {
-    Console.WriteLine("Oops. That is not a valid option.  Try again.");
-}
-switch (option)
-{
-    case 1:
-        CheckBalance(ref currentCustomer);
-        break;
+    Console.Clear();
+    Console.WriteLine(@"Please pick an option from the list below.
+    1.  Check Balance
+    2.  Withdraw
+    3.  Deposit
+    4.  Display last 5 transactions
+    5.  Quick Withdraw $40
+    6.  Quick Withdraw $100
+    7.  End current session");
+    Console.Write("Selection: ");
 
-    case 2:
-        double withdrawl = -1;
+    while (!Int32.TryParse(Console.ReadLine(), out option)) ;  //  Check if input is an integer
+    if (option < 1 || option > 7)
+    {
+        Console.WriteLine("Oops. That is not a valid option.  Try again.");
+    }
+    switch (option)
+    {
+        case 1:
+            CheckBalance(ref currentCustomer);
+            break;
 
-        MakeWithdrawl(ref currentCustomer, withdrawl);
-        break;
+        case 2:
+            double withdrawl = -1;
 
-    case 3:
-        double deposit = -1;
+            MakeWithdrawl(ref currentCustomer, withdrawl);
+            break;
 
-        MakeDeposit(ref currentCustomer, deposit);
-        break;
-        
-    case 5:
-        int amount40 = 40;
-        QuickWithdrawl(ref currentCustomer, amount40);
-        break;
+        case 3:
+            double deposit = -1;
+            MakeDeposit(ref currentCustomer, deposit);
+            break;
 
-    case 6:
-        int amount100 = 100;
-        QuickWithdrawl(ref currentCustomer, amount100);
-        break;
+        case 4:
+            LastFive(ref currentCustomer, transStack);
+            break;
 
+        case 5:
+            int amount40 = 40;
+            QuickWithdrawl(ref currentCustomer, amount40);
+            break;
 
-}
+        case 6:
+            int amount100 = 100;
+            QuickWithdrawl(ref currentCustomer, amount100);
+            break;
 
+        case 7:
+            List<string> writeBankFile = new List<string>();
+
+            for (int i = 0; i < customerData.Count; i++)
+            {
+                writeBankFile.Add($"{customerData[i].userName}, {customerData[i].PIN}, {customerData[i].balance}");
+            }
+            File.WriteAllLines("bank.txt", writeBankFile);
+            break;
+    }
+} while (option != 7);
+
+//  Method for validating login
 (string userName, int PIN, double balance) ValidLogin(List<(string userName, int PIN, double balance)> customerData)
 {
 
@@ -122,13 +131,15 @@ switch (option)
 
 }
 
+//Method to check balance
 void CheckBalance(ref (string userName, int PIN, double balance) currentCustomer)
 {
-    //int indy = location;
-    Console.WriteLine($"Your current balance is: {currentCustomer.balance}");
-
+    Console.WriteLine($"Your current balance is: ${currentCustomer.balance}.\nPress any key to continue.");
+    Console.ReadKey(true);
 }
 
+
+//  Method for making deposits.
 void MakeDeposit(ref (string userName, int PIN, double balance) currentCustomer, double deposit)
 {
     bool isValidDeposit = false;
@@ -155,10 +166,11 @@ void MakeDeposit(ref (string userName, int PIN, double balance) currentCustomer,
     }
     transStack.Push(deposit);
     currentCustomer.balance = currentCustomer.balance + deposit;
-    Console.WriteLine($"Your current balance is: {currentCustomer.balance}");
-
+    Console.WriteLine($"Your current balance is: ${currentCustomer.balance}.\nPress any key to continue.");
+    Console.ReadKey(true);
 }
 
+//  Methods for making withdrawls.
 void MakeWithdrawl(ref (string userName, int PIN, double balance) currentCustomer, double withdrawl)
 {
     bool isValidWithdrawl = false;
@@ -193,18 +205,35 @@ void MakeWithdrawl(ref (string userName, int PIN, double balance) currentCustome
     }
     transStack.Push(-1 * withdrawl);
     currentCustomer.balance = currentCustomer.balance - withdrawl;
-    Console.WriteLine($"Your current balance is: {currentCustomer.balance}");
+    Console.WriteLine($"Your current balance is: ${currentCustomer.balance}.\nPress any key to continue.");
+    Console.ReadKey(true);
 
 }
 
 void QuickWithdrawl(ref (string userName, int PIN, double balance) currentCustomer, int amount)
 {
     if (amount > currentCustomer.balance)
-        {
-            Console.WriteLine($"Oops. You don't have that much money in your account.  \nYou may withdraw up to ${currentCustomer.balance}.");
-            return;
-        }
+    {
+        Console.WriteLine($"Oops. You don't have that much money in your account.  \nYou may withdraw up to ${currentCustomer.balance}.");
+        return;
+    }
     currentCustomer.balance = currentCustomer.balance - amount;
     transStack.Push(-1 * amount);
-    Console.WriteLine($"You are doing a quick withdrawl for ${amount}. \n Your new balance is {currentCustomer.balance}.");
+    Console.WriteLine($"You are doing a quick withdrawl for ${amount}. \n Your new balance is ${currentCustomer.balance}.\nPress any key to continue.");
+    Console.ReadKey(true);
+}
+
+void LastFive(ref (string userName, int PIN, double balance) currentCustomer, Stack<double>transStack)
+{
+    Console.WriteLine("Your last transactions during this login were: ");
+    Stack<double> tempStack = new Stack<double>(transStack);
+
+    int tempTrans = 5;
+    if (transStack.Count < 5) tempTrans = transStack.Count;
+    for (int i = 0;  i < tempTrans; i++)
+    {
+        Console.WriteLine($"{tempStack.Pop}");
+    }
+    Console.WriteLine($"Your current balance is: ${currentCustomer.balance}.\nPress any key to continue.");
+    Console.ReadKey(true);
 }

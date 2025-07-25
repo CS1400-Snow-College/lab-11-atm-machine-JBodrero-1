@@ -1,4 +1,4 @@
-mlewellen,	12345,	45000.00
-jallen,	54321,	15.00
-gsorensen,	42914,	140.00
+mlewellen, 12345, 45000
+jallen, 54321, 15
+gsorensen, 42914, 140
 jbodrero, 11235, 23456.78
