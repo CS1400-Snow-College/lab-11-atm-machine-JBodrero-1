@@ -1,0 +1,15 @@
+C:\Users\jbodr\my-code-dir\lab-11-atm-machine-JBodrero-1\bin\Debug\net9.0\lab-11-atm-machine-JBodrero-1.exe
+C:\Users\jbodr\my-code-dir\lab-11-atm-machine-JBodrero-1\bin\Debug\net9.0\lab-11-atm-machine-JBodrero-1.deps.json
+C:\Users\jbodr\my-code-dir\lab-11-atm-machine-JBodrero-1\bin\Debug\net9.0\lab-11-atm-machine-JBodrero-1.runtimeconfig.json
+C:\Users\jbodr\my-code-dir\lab-11-atm-machine-JBodrero-1\bin\Debug\net9.0\lab-11-atm-machine-JBodrero-1.dll
+C:\Users\jbodr\my-code-dir\lab-11-atm-machine-JBodrero-1\bin\Debug\net9.0\lab-11-atm-machine-JBodrero-1.pdb
+C:\Users\jbodr\my-code-dir\lab-11-atm-machine-JBodrero-1\obj\Debug\net9.0\lab-11-atm-machine-JBodrero-1.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\jbodr\my-code-dir\lab-11-atm-machine-JBodrero-1\obj\Debug\net9.0\lab-11-atm-machine-JBodrero-1.AssemblyInfoInputs.cache
+C:\Users\jbodr\my-code-dir\lab-11-atm-machine-JBodrero-1\obj\Debug\net9.0\lab-11-atm-machine-JBodrero-1.AssemblyInfo.cs
+C:\Users\jbodr\my-code-dir\lab-11-atm-machine-JBodrero-1\obj\Debug\net9.0\lab-11-atm-machine-JBodrero-1.csproj.CoreCompileInputs.cache
+C:\Users\jbodr\my-code-dir\lab-11-atm-machine-JBodrero-1\obj\Debug\net9.0\lab-11-atm-machine-JBodrero-1.sourcelink.json
+C:\Users\jbodr\my-code-dir\lab-11-atm-machine-JBodrero-1\obj\Debug\net9.0\lab-11-atm-machine-JBodrero-1.dll
+C:\Users\jbodr\my-code-dir\lab-11-atm-machine-JBodrero-1\obj\Debug\net9.0\refint\lab-11-atm-machine-JBodrero-1.dll
+C:\Users\jbodr\my-code-dir\lab-11-atm-machine-JBodrero-1\obj\Debug\net9.0\lab-11-atm-machine-JBodrero-1.pdb
+C:\Users\jbodr\my-code-dir\lab-11-atm-machine-JBodrero-1\obj\Debug\net9.0\lab-11-atm-machine-JBodrero-1.genruntimeconfig.cache
+C:\Users\jbodr\my-code-dir\lab-11-atm-machine-JBodrero-1\obj\Debug\net9.0\ref\lab-11-atm-machine-JBodrero-1.dll

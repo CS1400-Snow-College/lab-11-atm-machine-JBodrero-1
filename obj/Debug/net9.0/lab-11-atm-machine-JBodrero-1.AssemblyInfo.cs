@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("lab-11-atm-machine-JBodrero-1")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+5aefca5ad8143ed279112c8d1c04d625c26fffff")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+4908e96bebb2428ca8b7c2c3025b27786a37745d")]
 [assembly: System.Reflection.AssemblyProductAttribute("lab-11-atm-machine-JBodrero-1")]
 [assembly: System.Reflection.AssemblyTitleAttribute("lab-11-atm-machine-JBodrero-1")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
