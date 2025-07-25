@@ -3,8 +3,11 @@
 //  Lab 10  ATM
 
 
-string[] readBankFile = File.ReadAllLines("bank.txt");  // Read in bank database
+using System.Diagnostics;
+
+string[] readBankFile = LoadBankCustomers();
 List<(string userName, int PIN, double balance)> customerData = new List<(string userName, int PIN, double balance)>();
+(string userName, int PIN, double balance) testData = ("testRun", 98765, 1000);
 
 string[] customerTemp;
 
@@ -16,15 +19,18 @@ double balanceTemp = 0;
 int location; 
 int option = -1;
 
-foreach (string customer in readBankFile)       //
+foreach (string customer in readBankFile)       //  Load the bank data
 {
     customerTemp = customer.Split(',');
     nameTemp = customerTemp[0];
     PINTemp = Convert.ToInt32(customerTemp[1]);
     balanceTemp = Convert.ToDouble(customerTemp[2]);
     customerData.Add((nameTemp, PINTemp, balanceTemp));
-
 }
+
+//Debug.Assert(ValidLogin(testData) == true);
+//Debug.Assert(MakeDeposit(ref testData, 100));
+//Debug.Assert(MakeDeposit(testData, 100) == true);
 
 /*foreach (var customer in customerData)
 {
@@ -91,17 +97,37 @@ do
             QuickWithdrawl(ref currentCustomer, amount100);
             break;
 
-        case 7:
-            List<string> writeBankFile = new List<string>();
-
-            for (int i = 0; i < customerData.Count; i++)
-            {
-                writeBankFile.Add($"{customerData[i].userName}, {customerData[i].PIN}, {customerData[i].balance}");
-            }
-            File.WriteAllLines("bank.txt", writeBankFile);
+        case 7:     //  Update current customer to bank file and write out to file.
+            int place = customerData.FindIndex(x => x.userName == currentCustomer.userName);
+            customerData.RemoveAt(place);
+            customerData.Insert(place, currentCustomer);
+            SaveBankCustomers(customerData);
             break;
     }
 } while (option != 7);
+
+
+string[] LoadBankCustomers()
+{
+    string[] Data = File.ReadAllLines("bank.txt");  // Read in bank database
+    return Data;
+}
+
+
+
+void SaveBankCustomers(List<(string userName, int PIN, double balance)> customerData)
+{
+    List<string> writeBankFile = new List<string>();
+
+    
+    for (int i = 0; i < customerData.Count; i++)
+    {
+        writeBankFile.Add($"{customerData[i].userName}, {customerData[i].PIN}, {customerData[i].balance}");
+    }
+            //foreach(string bankFile in writeBankFile)
+            //Console.WriteLine(bankFile);
+            File.WriteAllLines("bank.txt", writeBankFile);
+}
 
 //  Method for validating login
 (string userName, int PIN, double balance) ValidLogin(List<(string userName, int PIN, double balance)> customerData)
@@ -148,6 +174,9 @@ void MakeDeposit(ref (string userName, int PIN, double balance) currentCustomer,
     {
         Console.Write("How much are you depositing? $");
         string input = Console.ReadLine();
+        input.Trim('$');
+        input.Trim(' ');
+        input.Trim(';');
 
         // Try to parse the input as a double > 0
 
@@ -155,12 +184,14 @@ void MakeDeposit(ref (string userName, int PIN, double balance) currentCustomer,
 
         if (!isValidDeposit)
         {
-            Console.WriteLine("Oops. That is not a valid amount. Please enter a valid number.");
+            Console.WriteLine("Oops. That is not a valid amount. Please enter a valid number.\nPress any key to continue.");
+            Console.ReadKey(true);
             return;
         }
         if (deposit <= 0)
         {
-            Console.WriteLine("Oops. That is not a valid amount. Please enter a number greater than 0.00.");
+            Console.WriteLine("Oops. That is not a valid amount. Please enter a number greater than 0.00.\nPress any key to continue.");
+            Console.ReadKey(true);
             return;
         }
     }
@@ -189,17 +220,20 @@ void MakeWithdrawl(ref (string userName, int PIN, double balance) currentCustome
 
         if (!isValidWithdrawl)
         {
-            Console.WriteLine("Oops. That is not a valid amount. Please enter a valid number.");
+            Console.WriteLine("Oops. That is not a valid amount. Please enter a valid number.\nPress any key to continue.");
+            Console.ReadKey(true);
             return;
         }
         if (withdrawl <= 0)
         {
-            Console.WriteLine("Oops. That is not a valid amount. Please enter a number greater than 0.00.");
+            Console.WriteLine("Oops. That is not a valid amount. Please enter a number greater than 0.00.\nPress any key to continue.");
+            Console.ReadKey(true);
             return;
         }
         if (withdrawl > currentCustomer.balance)
         {
-            Console.WriteLine($"Oops. You don't have that much money in your account.  \nYou may withdraw up to ${currentCustomer.balance}.");
+            Console.WriteLine($"Oops. You don't have that much money in your account.  \nYou may withdraw up to ${currentCustomer.balance}.\nPress any key to continue.");
+            Console.ReadKey(true);
             return;
         }
     }
@@ -214,7 +248,8 @@ void QuickWithdrawl(ref (string userName, int PIN, double balance) currentCustom
 {
     if (amount > currentCustomer.balance)
     {
-        Console.WriteLine($"Oops. You don't have that much money in your account.  \nYou may withdraw up to ${currentCustomer.balance}.");
+        Console.WriteLine($"Oops. You don't have that much money in your account.  \nYou may withdraw up to ${currentCustomer.balance}.\nPress any key to continue.");
+        Console.ReadKey(true);
         return;
     }
     currentCustomer.balance = currentCustomer.balance - amount;
@@ -229,10 +264,21 @@ void LastFive(ref (string userName, int PIN, double balance) currentCustomer, St
     Stack<double> tempStack = new Stack<double>(transStack);
 
     int tempTrans = 5;
-    if (transStack.Count < 5) tempTrans = transStack.Count;
+    if (transStack.Count < 5)
+      { tempTrans = transStack.Count; }
     for (int i = 0;  i < tempTrans; i++)
     {
-        Console.WriteLine($"{tempStack.Pop}");
+         double transaction = tempStack.Pop();
+
+        // Display the transaction (positive for deposits, negative for withdrawals)
+        if (transaction > 0)
+        {
+            Console.WriteLine($"Deposited: ${transaction}");
+        }
+        else
+        {
+            Console.WriteLine($"Withdrew:  ${-transaction}");
+        }
     }
     Console.WriteLine($"Your current balance is: ${currentCustomer.balance}.\nPress any key to continue.");
     Console.ReadKey(true);
