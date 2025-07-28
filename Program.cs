@@ -1,25 +1,24 @@
 ﻿//  Jonathan Bodrero
-//  July 25, 25
+//  July 25-28, 25
 //  Lab 10  ATM
 
 
 using System.Diagnostics;
 
-string[] readBankFile = LoadBankCustomers();
+string[] readBankFile = LoadBankCustomers();    //  Load customer data.
 List<(string userName, int PIN, double balance)> customerData = new List<(string userName, int PIN, double balance)>();
 (string userName, int PIN, double balance) testData = ("testRun", 98765, 1000);
 
 string[] customerTemp;
 
-Stack<double> transStack = new Stack<double>();
+Stack<double> transStack = new Stack<double>(); // Create a stack to track last transactions.
 
 string nameTemp = "";
 int PINTemp = 0;
 double balanceTemp = 0;
-int location; 
 int option = -1;
 
-foreach (string customer in readBankFile)       //  Load the bank data
+foreach (string customer in readBankFile)       //  Load all the bank data into customerData List
 {
     customerTemp = customer.Split(',');
     nameTemp = customerTemp[0];
@@ -27,8 +26,9 @@ foreach (string customer in readBankFile)       //  Load the bank data
     balanceTemp = Convert.ToDouble(customerTemp[2]);
     customerData.Add((nameTemp, PINTemp, balanceTemp));
 }
-
-//Debug.Assert(ValidLogin(testData) == true);
+//Debug.Assert(MakeDeposit(ref testData, 100));
+//Debug.Assert(MakeDeposit(ref testData, -100) == false);
+//Debug.Assert(ValidLogin(ref testData));
 //Debug.Assert(MakeDeposit(ref testData, 100));
 //Debug.Assert(MakeDeposit(testData, 100) == true);
 
@@ -40,7 +40,7 @@ foreach (string customer in readBankFile)       //  Load the bank data
 
 Console.Clear();
 Console.WriteLine("Welcome to BadgerBank.");
-currentCustomer = ValidLogin(customerData);
+currentCustomer = ValidLogin(customerData);     //  Check for valid customer login
 
 /*if (currentCustomer.PIN != -1)
 {
@@ -61,7 +61,7 @@ do
     7.  End current session");
     Console.Write("Selection: ");
 
-    while (!Int32.TryParse(Console.ReadLine(), out option)) ;  //  Check if input is an integer
+    while (!Int32.TryParse(Console.ReadLine(), out option)) ;  //  Check if input choice is an integer
     if (option < 1 || option > 7)
     {
         Console.WriteLine("Oops. That is not a valid option.  Try again.");
@@ -145,7 +145,7 @@ void SaveBankCustomers(List<(string userName, int PIN, double balance)> customer
         return ("", -1, 0.0);
     }
     
-    foreach (var user in customerData)
+    foreach (var user in customerData)          //  Check pin matches username.
     {  if (user.userName == inputUser && user.PIN == inputPIN)
         {
             return user;  // Return the matched tuple
@@ -154,7 +154,6 @@ void SaveBankCustomers(List<(string userName, int PIN, double balance)> customer
 
         Console.WriteLine("That is not a valid username / PIN number combination. Try starting over.");
         return ("", -1, 0.0);
-
 }
 
 //Method to check balance
@@ -186,19 +185,20 @@ void MakeDeposit(ref (string userName, int PIN, double balance) currentCustomer,
         {
             Console.WriteLine("Oops. That is not a valid amount. Please enter a valid number.\nPress any key to continue.");
             Console.ReadKey(true);
-            return;
+            return;// false;
         }
         if (deposit <= 0)
         {
             Console.WriteLine("Oops. That is not a valid amount. Please enter a number greater than 0.00.\nPress any key to continue.");
             Console.ReadKey(true);
-            return;
+            return; // false;
         }
     }
     transStack.Push(deposit);
     currentCustomer.balance = currentCustomer.balance + deposit;
     Console.WriteLine($"Your current balance is: ${currentCustomer.balance}.\nPress any key to continue.");
     Console.ReadKey(true);
+    return; // true;
 }
 
 //  Methods for making withdrawls.
@@ -258,17 +258,18 @@ void QuickWithdrawl(ref (string userName, int PIN, double balance) currentCustom
     Console.ReadKey(true);
 }
 
-void LastFive(ref (string userName, int PIN, double balance) currentCustomer, Stack<double>transStack)
+void LastFive(ref (string userName, int PIN, double balance) currentCustomer, Stack<double>transStack)  // I got a little help from AI on this method.
 {
     Console.WriteLine("Your last transactions during this login were: ");
-    Stack<double> tempStack = new Stack<double>(transStack);
+    Stack<double> tempStack = new Stack<double>(transStack);    //  It appears this copying of stacks reverses order (feedback from AI).
+    Stack<double> tempStack2 = new Stack<double>(tempStack);    //  Reverse the order back.
 
     int tempTrans = 5;
     if (transStack.Count < 5)
       { tempTrans = transStack.Count; }
     for (int i = 0;  i < tempTrans; i++)
     {
-         double transaction = tempStack.Pop();
+         double transaction = tempStack2.Pop();
 
         // Display the transaction (positive for deposits, negative for withdrawals)
         if (transaction > 0)
