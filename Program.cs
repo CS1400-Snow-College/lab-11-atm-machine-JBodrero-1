@@ -12,6 +12,7 @@ List<(string userName, int PIN, double balance)> customerData = new List<(string
 string[] customerTemp;
 
 Stack<double> transStack = new Stack<double>(); // Create a stack to track last transactions.
+Stack<double> transStackTest = new Stack<double>(); // Create a stack to track last transactions.
 
 string nameTemp = "";
 int PINTemp = 0;
@@ -26,6 +27,7 @@ foreach (string customer in readBankFile)       //  Load all the bank data into 
     balanceTemp = Convert.ToDouble(customerTemp[2]);
     customerData.Add((nameTemp, PINTemp, balanceTemp));
 }
+//Debug.Assert(MakeDeposit(ref testData, 75.00, ref transStackTest) == true, "Error in make deposit.");
 //Debug.Assert(MakeDeposit(ref testData, 100));
 //Debug.Assert(MakeDeposit(ref testData, -100) == false);
 //Debug.Assert(ValidLogin(ref testData));
@@ -42,11 +44,12 @@ Console.Clear();
 Console.WriteLine("Welcome to BadgerBank.");
 currentCustomer = ValidLogin(customerData);     //  Check for valid customer login
 
-/*if (currentCustomer.PIN != -1)
+if (currentCustomer.userName == "" || currentCustomer.PIN < 0)
 {
-    Console.Clear();
-    Console.WriteLine("Thank you for logging in. ");
-}*/
+    Console.WriteLine("Login failed. Exiting program.");
+    Environment.Exit(0);  // AI helped me do this to terminate the program  
+}
+
 
 do
 {
@@ -61,10 +64,20 @@ do
     7.  End current session");
     Console.Write("Selection: ");
 
-    while (!Int32.TryParse(Console.ReadLine(), out option)) ;  //  Check if input choice is an integer
-    if (option < 1 || option > 7)
+    string userInput = Console.ReadLine();
+
+    while (!Int32.TryParse(userInput, out option) || option < 1 || option > 7)  // AI helped me combine code into one while loop.
     {
-        Console.WriteLine("Oops. That is not a valid option.  Try again.");
+
+        Console.SetCursorPosition(0, 9);
+        Console.WriteLine("                                                                                           ");
+        Console.SetCursorPosition(0, 9);
+        Console.WriteLine($"Oops. \"{userInput}\" is not a valid option. Please enter a number between 1 and 7.");
+        Console.SetCursorPosition(0, 8);
+        Console.WriteLine("                          ");
+        Console.SetCursorPosition(0, 8);
+        Console.Write("Selection: ");
+        userInput = Console.ReadLine();
     }
     switch (option)
     {
@@ -75,35 +88,41 @@ do
         case 2:
             double withdrawl = -1;
 
-            MakeWithdrawl(ref currentCustomer, withdrawl);
+            MakeWithdrawl(ref currentCustomer, withdrawl, ref transStack);
             break;
 
         case 3:
             double deposit = -1;
-            MakeDeposit(ref currentCustomer, deposit);
+            MakeDeposit(ref currentCustomer, deposit, ref transStack);
             break;
 
         case 4:
-            LastFive(ref currentCustomer, transStack);
+            LastFive(ref currentCustomer, ref transStack);
             break;
 
         case 5:
             int amount40 = 40;
-            QuickWithdrawl(ref currentCustomer, amount40);
+            QuickWithdrawl(ref currentCustomer, amount40, ref transStack);
             break;
 
         case 6:
             int amount100 = 100;
-            QuickWithdrawl(ref currentCustomer, amount100);
+            QuickWithdrawl(ref currentCustomer, amount100, ref transStack);
             break;
 
         case 7:     //  Update current customer to bank file and write out to file.
+            Console.WriteLine("Thanks for banking with BadgerBank!  Goodbye.");
             int place = customerData.FindIndex(x => x.userName == currentCustomer.userName);
             customerData.RemoveAt(place);
             customerData.Insert(place, currentCustomer);
             SaveBankCustomers(customerData);
             break;
     }
+    /* if (option != 7)
+    {
+        Console.WriteLine("\nPress Enter to return to the menu...");
+        Console.ReadLine();
+    }*/
 } while (option != 7);
 
 
@@ -115,7 +134,7 @@ string[] LoadBankCustomers()
 
 
 
-void SaveBankCustomers(List<(string userName, int PIN, double balance)> customerData)
+static void SaveBankCustomers(List<(string userName, int PIN, double balance)> customerData)
 {
     List<string> writeBankFile = new List<string>();
 
@@ -152,25 +171,33 @@ void SaveBankCustomers(List<(string userName, int PIN, double balance)> customer
         }
     }
 
-        Console.WriteLine("That is not a valid username / PIN number combination. Try starting over.");
-        return ("", -1, 0.0);
+        Console.WriteLine("That is not a valid username / PIN number combination.");
+        return ("", -918, 0.0);
+        
 }
 
 //Method to check balance
-void CheckBalance(ref (string userName, int PIN, double balance) currentCustomer)
+static bool CheckBalance(ref (string userName, int PIN, double balance) currentCustomer)
 {
-    Console.WriteLine($"Your current balance is: ${currentCustomer.balance}.\nPress any key to continue.");
+    Console.SetCursorPosition(0, 9);    // Clear out any prior warning message.
+    Console.WriteLine("                                                                                       ");
+    Console.SetCursorPosition(0, 9);
+    Console.WriteLine($"Your current balance is: ${currentCustomer.balance:F2}.\nPress any key to continue.");
     Console.ReadKey(true);
+    return true;
 }
 
 
 //  Method for making deposits.
-void MakeDeposit(ref (string userName, int PIN, double balance) currentCustomer, double deposit)
+static bool MakeDeposit(ref (string userName, int PIN, double balance) currentCustomer, double deposit, ref Stack<double> transStack)
 {
     bool isValidDeposit = false;
 
     while (!isValidDeposit)
     {
+        Console.SetCursorPosition(0, 9);    // Clear out any prior warning message.
+        Console.WriteLine("                                                                                       ");
+        Console.SetCursorPosition(0, 9);
         Console.Write("How much are you depositing? $");
         string input = Console.ReadLine();
         input.Trim('$');
@@ -181,33 +208,40 @@ void MakeDeposit(ref (string userName, int PIN, double balance) currentCustomer,
 
         isValidDeposit = Double.TryParse(input, out deposit);
 
-        if (!isValidDeposit)
+        if (!isValidDeposit || (deposit - Math.Round(deposit, 2) != 0)) // Ensure to nearest penny.
         {
             Console.WriteLine("Oops. That is not a valid amount. Please enter a valid number.\nPress any key to continue.");
             Console.ReadKey(true);
-            return;// false;
+            return false;
         }
+        deposit = Math.Round(deposit, 2);   //  Round input to two places (nearest cent).
         if (deposit <= 0)
         {
             Console.WriteLine("Oops. That is not a valid amount. Please enter a number greater than 0.00.\nPress any key to continue.");
             Console.ReadKey(true);
-            return; // false;
+            return false;
         }
     }
     transStack.Push(deposit);
     currentCustomer.balance = currentCustomer.balance + deposit;
-    Console.WriteLine($"Your current balance is: ${currentCustomer.balance}.\nPress any key to continue.");
+    Console.SetCursorPosition(0, 9);    // Clear out any prior warning message.
+    Console.WriteLine("                                                                                       ");
+    Console.SetCursorPosition(0, 9);
+    Console.WriteLine($"Your current balance is: ${Math.Round(currentCustomer.balance, 2)}.\nPress any key to continue.");
     Console.ReadKey(true);
-    return; // true;
+    return true;
 }
 
 //  Methods for making withdrawls.
-void MakeWithdrawl(ref (string userName, int PIN, double balance) currentCustomer, double withdrawl)
+static bool MakeWithdrawl(ref (string userName, int PIN, double balance) currentCustomer, double withdrawl, ref Stack<double> transStack)
 {
     bool isValidWithdrawl = false;
 
     while (!isValidWithdrawl)
     {
+        Console.SetCursorPosition(0, 9);    // Clear out any prior warning message.
+        Console.WriteLine("                                                                                       ");
+        Console.SetCursorPosition(0, 9);
         Console.Write("How much are you withdrawing? $");
         string input = Console.ReadLine();
         input.Trim('$');
@@ -217,60 +251,72 @@ void MakeWithdrawl(ref (string userName, int PIN, double balance) currentCustome
         // Try to parse the input as a double > 0
 
         isValidWithdrawl = Double.TryParse(input, out withdrawl);
-
-        if (!isValidWithdrawl)
+        
+        if (!isValidWithdrawl || (withdrawl - Math.Round(withdrawl, 2) != 0))  // Ensure nearest penny.
         {
             Console.WriteLine("Oops. That is not a valid amount. Please enter a valid number.\nPress any key to continue.");
             Console.ReadKey(true);
-            return;
+            return false;
         }
         if (withdrawl <= 0)
         {
-            Console.WriteLine("Oops. That is not a valid amount. Please enter a number greater than 0.00.\nPress any key to continue.");
+            Console.WriteLine("Oops. That is not a valid amount. Please enter a number greater than $0.00.\nPress any key to continue.");
             Console.ReadKey(true);
-            return;
+            return false;
         }
         if (withdrawl > currentCustomer.balance)
         {
-            Console.WriteLine($"Oops. You don't have that much money in your account.  \nYou may withdraw up to ${currentCustomer.balance}.\nPress any key to continue.");
+            Console.WriteLine($"Oops. You don't have that much money in your account.  \nYou may withdraw up to ${Math.Round(currentCustomer.balance, 2)}.\nPress any key to continue.");
             Console.ReadKey(true);
-            return;
+            return true;
         }
+        
     }
     transStack.Push(-1 * withdrawl);
     currentCustomer.balance = currentCustomer.balance - withdrawl;
-    Console.WriteLine($"Your current balance is: ${currentCustomer.balance}.\nPress any key to continue.");
+    Console.SetCursorPosition(0, 9);    // Clear out any prior warning message.
+    Console.WriteLine("                                                                                       ");
+    Console.SetCursorPosition(0, 9);
+    Console.WriteLine($"Your current balance is: ${Math.Round(currentCustomer.balance, 2)}.\nPress any key to continue.");
     Console.ReadKey(true);
+    return true;
 
 }
 
-void QuickWithdrawl(ref (string userName, int PIN, double balance) currentCustomer, int amount)
+static bool QuickWithdrawl(ref (string userName, int PIN, double balance) currentCustomer, int amount, ref Stack<double> transStack)
 {
     if (amount > currentCustomer.balance)
     {
-        Console.WriteLine($"Oops. You don't have that much money in your account.  \nYou may withdraw up to ${currentCustomer.balance}.\nPress any key to continue.");
+        Console.WriteLine($"Oops. You don't have that much money in your account.  \nYou may withdraw up to ${Math.Round(currentCustomer.balance, 2)}.\nPress any key to continue.");
         Console.ReadKey(true);
-        return;
+        return false;
     }
     currentCustomer.balance = currentCustomer.balance - amount;
     transStack.Push(-1 * amount);
-    Console.WriteLine($"You are doing a quick withdrawl for ${amount}. \n Your new balance is ${currentCustomer.balance}.\nPress any key to continue.");
+    Console.SetCursorPosition(0, 9);    // Clear out any prior warning message.
+    Console.WriteLine("                                                                                       ");
+    Console.SetCursorPosition(0, 9);
+    Console.WriteLine($"You are doing a quick withdrawl for ${amount}. \n Your new balance is ${Math.Round(currentCustomer.balance, 2):F2}.\nPress any key to continue.");
     Console.ReadKey(true);
+    return true;
 }
 
-void LastFive(ref (string userName, int PIN, double balance) currentCustomer, Stack<double>transStack)  // I got a little help from AI on this method.
+static bool LastFive(ref (string userName, int PIN, double balance) currentCustomer, ref Stack<double>transStack)  // I got a little help from AI on this method.
 {
+    Console.SetCursorPosition(0, 9);    // Clear out any prior warning message.
+    Console.WriteLine("                                                                                       ");
+    Console.SetCursorPosition(0, 9);
     Console.WriteLine("Your last transactions during this login were: ");
     Stack<double> tempStack = new Stack<double>(transStack);    //  It appears this copying of stacks reverses order (feedback from AI).
     Stack<double> tempStack2 = new Stack<double>(tempStack);    //  Reverse the order back.
 
     int tempTrans = 5;
     if (transStack.Count < 5)
-      { tempTrans = transStack.Count; }
-    for (int i = 0;  i < tempTrans; i++)
+    { tempTrans = transStack.Count; }
+    for (int i = 0; i < tempTrans; i++)
     {
-         double transaction = tempStack2.Pop();
-
+        double transaction = tempStack2.Pop();
+        
         // Display the transaction (positive for deposits, negative for withdrawals)
         if (transaction > 0)
         {
@@ -281,6 +327,7 @@ void LastFive(ref (string userName, int PIN, double balance) currentCustomer, St
             Console.WriteLine($"Withdrew:  ${-transaction}");
         }
     }
-    Console.WriteLine($"Your current balance is: ${currentCustomer.balance}.\nPress any key to continue.");
+    Console.WriteLine($"Your current balance is: ${Math.Round(currentCustomer.balance, 2):F2}.\nPress any key to continue.");
     Console.ReadKey(true);
+    return true;
 }

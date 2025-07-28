@@ -1,5 +1,5 @@
 mlewellen, 12345, 45000
-jallen, 54321, 705
+jallen, 54321, 706.6300000000001
 gsorensen, 42914, 140
-jbodrero, 11235, 23456.78
+jbodrero, 11235, 23556.78
 testRun, 98765, 10000
