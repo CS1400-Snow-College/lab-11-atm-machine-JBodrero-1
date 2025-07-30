@@ -3,11 +3,12 @@
 //  Lab 10  ATM
 
 
-using System.Diagnostics;
+using System.Diagnostics;   //  Allow Debug.Assert
 
+Console.Clear();
 string[] readBankFile = LoadBankCustomers();    //  Load customer data.
 List<(string userName, int PIN, double balance)> customerData = new List<(string userName, int PIN, double balance)>();
-(string userName, int PIN, double balance) testData = ("testRun", 98765, 1000);
+(string userName, int PIN, double balance) testData = ("testRun", 98765, 1000); // Item for possible testing.
 
 string[] customerTemp;
 
@@ -27,12 +28,13 @@ foreach (string customer in readBankFile)       //  Load all the bank data into 
     balanceTemp = Convert.ToDouble(customerTemp[2]);
     customerData.Add((nameTemp, PINTemp, balanceTemp));
 }
-//Debug.Assert(MakeDeposit(ref testData, 75.00, ref transStackTest) == true, "Error in make deposit.");
-//Debug.Assert(MakeDeposit(ref testData, 100));
-//Debug.Assert(MakeDeposit(ref testData, -100) == false);
-//Debug.Assert(ValidLogin(ref testData));
-//Debug.Assert(MakeDeposit(ref testData, 100));
-//Debug.Assert(MakeDeposit(testData, 100) == true);
+
+//  Debug.Assert(MakeDeposit(ref testData, 75.00, ref transStackTest) == true, "Make deposit must be positive.");
+        //  Debug.Assert(MakeDeposit(ref testData, -100, ref transStack) == false, "Make deposit must be positive.");
+//  Debug.Assert(MakeWithdrawl(ref testData, 50.00, ref transStackTest) == true, "Make withdrawal must be positive.");
+
+
+        //  Debug.Assert(ValidLogin(testData) == ("testRun", 98765, 1000));  // Not sure how to use this test because asks for user input.
 
 /*foreach (var customer in customerData)
 {
@@ -214,7 +216,7 @@ static bool MakeDeposit(ref (string userName, int PIN, double balance) currentCu
             Console.ReadKey(true);
             return false;
         }
-        deposit = Math.Round(deposit, 2);   //  Round input to two places (nearest cent).
+        //deposit = Math.Round(deposit, 2);   //  Round input to two places (nearest cent).
         if (deposit <= 0)
         {
             Console.WriteLine("Oops. That is not a valid amount. Please enter a number greater than 0.00.\nPress any key to continue.");
@@ -227,7 +229,7 @@ static bool MakeDeposit(ref (string userName, int PIN, double balance) currentCu
     Console.SetCursorPosition(0, 9);    // Clear out any prior warning message.
     Console.WriteLine("                                                                                       ");
     Console.SetCursorPosition(0, 9);
-    Console.WriteLine($"Your current balance is: ${Math.Round(currentCustomer.balance, 2)}.\nPress any key to continue.");
+    Console.WriteLine($"Your current balance is: ${Math.Round(currentCustomer.balance, 2):F2}.\nPress any key to continue.");
     Console.ReadKey(true);
     return true;
 }
@@ -277,7 +279,7 @@ static bool MakeWithdrawl(ref (string userName, int PIN, double balance) current
     Console.SetCursorPosition(0, 9);    // Clear out any prior warning message.
     Console.WriteLine("                                                                                       ");
     Console.SetCursorPosition(0, 9);
-    Console.WriteLine($"Your current balance is: ${Math.Round(currentCustomer.balance, 2)}.\nPress any key to continue.");
+    Console.WriteLine($"Your current balance is: ${Math.Round(currentCustomer.balance, 2):F2}.\nPress any key to continue.");
     Console.ReadKey(true);
     return true;
 
